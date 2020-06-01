@@ -1,7 +1,7 @@
 {
   "name": "mvp_list",
   "version": "1.0.0",
-  "description": "Discord Bot with CRUD Operations for Ragnarok MVP that lists time of death and respawn times of MVPs",
+  "description": "Bot which you can list and edit time of death of Ragnarok MVPs.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,14 +9,6 @@
   "author": "Marc Dy",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.19.0",
-    "colors": "^1.4.0",
-    "discord.js": "^12.2.0",
-    "eris": "^0.13.1",
-    "express": "^4.17.1",
-    "sequelize": "^5.21.11",
-    "sqlite3": "^4.2.0",
-    "sweetalert2": "^9.14.0",
-    "table": "^5.4.6"
+    "discord.js": "^12.2.0"
   }
 }
