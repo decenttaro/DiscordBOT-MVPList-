@@ -13,5 +13,5 @@ To start the bot in your discord channel/server.
 
 
 Disclaimer:
-This will not work since Discord will changed the token when it goes to a different system. 
+This will not work since Discord will change the token when it goes to a different system. 
 Discord does this for security reasons.
