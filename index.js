@@ -1,118 +1,140 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const Sequelize = require('sequelize');
+
+// Contains the prefix and token values
 const { prefix, token } = require('./config.json');
 
 
+// Creates DB connection
+const sequelize = new Sequelize('database', 'user', 'password', {
+	host: 'localhost',
+	dialect: 'sqlite',
+	logging: false,
+	// SQLite only
+	storage: 'database.sqlite',
+});
 
-//List of death times
-var timeOfDeath = ["00:00:00","00:00:01","00:00:02","00:00:03","00:00:04","00:00:05","00:00:06","00:00:07","00:00:08",];
-
-
-//List of commands
-var commands = ["!bhlist", "!bhedit"];
-
-
-
-client.on('ready', () => {
-    console.log('Starting MVP List Discord Bot...');
+// DB model
+const Tags = sequelize.define('tags', {
+	name: {
+		type: Sequelize.STRING,
+		unique: true,
+	},
+	death: Sequelize.STRING
 });
 
 
-// Commands
-client.on('message', message => {
+client.on('ready', () => {
+    console.log('Starting MVP List Discord Bot...'); // Indication that program is ready...
+    Tags.sync(); // Creates the model in the database
+});
 
+
+client.on('message', async message => {
+    
     if (!message.content.startsWith(prefix) || message.author.bot) return;
 
     const args = message.content.slice(prefix.length).split(' ');
     const command = args.shift().toLowerCase();
+    const commandArgs = args.join(' ');
     
     // List all the commands you can use
     if (command === 'bhcommands') {
-        message.channel.send('`' + commands + '`');
 
-    // List all the MVPs
-    } else if (command === 'bhlist') {
-        const mvpEmbed = new Discord.MessageEmbed()
-        .setColor('#bab86c')
-        .setTitle('Time of Deaths')
+        const commandsEmbed = new Discord.MessageEmbed()
+        .setColor('#424874')
+        .setTitle('List of commands')
         .addFields(
-            { name: 'Memory of Thanatos ', value: 'Time Of Death: ' + timeOfDeath[0]},
-            { name: 'Gloom Under Night ', value: 'Time Of Death: ' + timeOfDeath[1]},
-            { name: 'Fallen Bishop Hibram ', value: 'Time Of Death: ' + timeOfDeath[2]},
-            { name: 'Assassin Cross Eremes ', value: 'Time Of Death: ' + timeOfDeath[3]},
-            { name: 'High Priest Margaretha ', value: 'Time Of Death: ' + timeOfDeath[4]},
-            { name: 'High Wizard Kathryne ', value: 'Time Of Death: ' +timeOfDeath[5]},
-            { name: 'Lord Knight Seyren ', value: 'Time Of Death: ' + timeOfDeath[6]},
-            { name: 'Master Smith Howard ', value: 'Time Of Death: ' + timeOfDeath[7]},
-            { name: 'Sniper Cecil ', value: 'Time Of Death: ' + timeOfDeath[8]},
+            {name: '1) !bhlistall', value: 'Shows every MVPs time of deaths'},
+            {name: '2) !bhlist [MVP Name]', value: 'Prints only specific MVPs time of death'},
+            {name: '3) !bhadd [MVP Name] [Time of Death]', value: 'Adds MVP info to the database'},
+            {name: '4) !bhedit [MVP Name] [Time of Death]', value: 'Updates MVPs time of death'},
+            {name: '5) !bhdelete [MVP Name]', value: 'Deletes a specific MVPs info in the database'},
+            {name: '!bhtimer [# of minutes]', value: 'Sets a timer depending on how many minutes user wants'}
         );
-        message.channel.send(mvpEmbed);
+        message.channel.send(commandsEmbed);
 
-    // bhadd
+
+    // bhadd - Adds a specific MVP/Time of death
     } else if (command === 'bhadd') {
-        message.channel.send('Does not do shit yet!');
-    
-    // bhedit - Edits time of death of MVPs
-    }else if (command === 'bhedit') {
-        const editEmbed = new Discord.MessageEmbed()
-        .setColor('#0099ff')
-        .setTitle('Which MVP do you want to edit time of death? ')
-        .addFields(
-            {name: 'Press !0 = Memory of Thanatos: '+ timeOfDeath[0] , value: '================================='},
-            {name: 'Press !1 = Gloom Under Night: '+ timeOfDeath[1], value: '================================='},
-            {name: 'Press !2 = Fallen Bishop Hibram: '+ timeOfDeath[2], value: '================================='},
-            {name: 'Press !3 = Assassin Cross Eremes: '+ timeOfDeath[3], value: '================================='},
-            {name: 'Press !4 = High Priest Margaretha: '+ timeOfDeath[4], value: '================================='},
-            {name: 'Press !5 = High Wizard Kathryne: '+ timeOfDeath[5], value: '================================='},
-            {name: 'Press !6 = Lord Knight Seyren: '+ timeOfDeath[6], value: '================================='},
-            {name: 'Press !7 = Master Smith Howard: '+ timeOfDeath[7], value: '================================='},
-            {name: 'Press !8 = Sniper Cecil: '+ timeOfDeath[8], value: '================================='},
-        );
-        message.channel.send(editEmbed);
-        message.channel.send('Format is: !0 [Time of Death] = !0 00:01:25');
 
-    // bhdelete 
+        const splitArgs = commandArgs.split(' ');
+        const mvpName = splitArgs.shift();
+        const deathTime = splitArgs.join(' ');
+
+        
+        try {
+            // equivalent to: INSERT INTO tags (name, time) values (?, ?);
+            const tag = await Tags.create({
+                name: mvpName,
+                death: deathTime
+            });
+            return message.reply('`' + `MVP ${tag.name} - ${tag.death} added.` + '`');
+        }
+        catch (e) {
+            if (e.name === 'SequelizeUniqueConstraintError') {
+                return message.reply('`' + 'That MVP name already exists.' + '`');
+            } 
+            return message.reply('`' + 'Something went wrong with adding that command.' + '`');
+        }
+       
+
+    // bhdelete - Deletes a specific MVP
     }  else if (command === 'bhdelete') {
-        message.channel.send('Does not do shit yet!');
-    } 
+        
+        const mvpName = commandArgs;
+        // equivalent to: DELETE from tags WHERE name = ?;
+        const rowCount = await Tags.destroy({ where: { name: mvpName } });
+        if (!rowCount) return message.reply('`' + 'That MVP name does not exist.' + '`');
+        
+        return message.reply('`' + `MVP ${mvpName} deleted.` + '`');
+        
 
-    switch(command) {
-        case '0':
-            timeOfDeath[0] = args[0];
-            message.channel.send('Edited successfully!'); 
-            break;
-        case '1':
-            timeOfDeath[1] = args[0];
-            message.channel.send('Edited successfully!'); 
-            break;
-        case '2':
-            timeOfDeath[2] = args[0];
-            message.channel.send('Edited successfully!'); 
-            break;
-        case '3':
-            timeOfDeath[3] = args[0];
-            message.channel.send('Edited successfully!'); 
-            break;         
-        case '4':
-            timeOfDeath[4] = args[0];
-            message.channel.send('Edited successfully!'); 
-            break;
-        case '5':
-            timeOfDeath[5] = args[0];
-            message.channel.send('Edited successfully!'); 
-            break;  
-        case '6':
-            timeOfDeath[6] = args[0];
-            message.channel.send('Edited successfully!'); 
-            break; 
-        case '7':
-            timeOfDeath[7] = args[0];
-            message.channel.send('Edited successfully!'); 
-            break;
-        case '8':
-            timeOfDeath[8] = args[0];
-            message.channel.send('Edited successfully!'); 
-            break;  
+    // bhlist - Only prints a specific MVP
+    } else if (command === 'bhlist') {
+
+        const mvpName = commandArgs;
+
+        // equivalent to: SELECT * FROM tags WHERE name = 'mvpName' LIMIT 1;
+        const tag = await Tags.findOne({ where: { name: mvpName } });
+        if (tag) {
+            return message.channel.send('`' + tag.get('name') + ': ' + tag.get('death') + '`');
+        }
+        return message.reply('`' + `Could not find MVP name: ${mvpName}` + '`');
+
+
+    // bhedit - Edits time of death of MVPs        
+    } else if (command === 'bhedit') {
+        const splitArgs = commandArgs.split(' ');
+        const mvpName = splitArgs.shift();
+        const deathTime = splitArgs.join(' ');
+
+        // equivalent to: UPDATE tags (time of death) values (?) WHERE name='?';
+        const affectedRows = await Tags.update({ death: deathTime }, { where: { name: mvpName } });
+        if (affectedRows > 0) {
+            return message.reply('`' + `MVP ${mvpName} - ${deathTime} successfully edited.` + '`');
+        }
+        return message.reply('`' + `Could not find an mvp with name ${mvpName}.` + '`');
+
+
+    // List all the MVPs        
+    } else if (command === 'bhlistall'){
+
+        const mvpList = await Tags.findAll({ attributes: ['name', 'death']});
+        const mvpString = mvpList.map(t => t.name + ': ' +  t.death).join(' \n')|| '`' + 'No MVPs set.' + '`';
+        return message.channel.send('`' + mvpString + '`');
+    
+    } else if (command === 'bhtimer') {
+        
+        if(isNaN(args[0])){
+            message.channel.send('Wrong input!');
+        } else {
+            message.channel.send('Added timer successfully!');
+            setTimeout(function () {
+                message.channel.send(`Your ${args[0]} minute/s is up!`)
+            }, args[0] * 60000)
+        } 
     }
 });
 
