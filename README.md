@@ -17,17 +17,17 @@ Added Countdown timer.
 
 List of commands;
 
--!bhlistall -	Shows every MVP's time of deaths
+- !bhlistall -	Shows every MVP's time of deaths
 
--!bhlist [MVP Name] -	Prints only specific MVP's time of death
+- !bhlist [MVP Name] -	Prints only specific MVP's time of death
 
--!bhadd [MVP Name] [Time of Death] -	Adds MVP's info to the database
+- !bhadd [MVP Name] [Time of Death] -	Adds MVP's info to the database
 
--!bhedit [MVP Name] [Time of Death] -	Updates MVP's time of death
+- !bhedit [MVP Name] [Time of Death] -	Updates MVP's time of death
 
--!bhdelete [MVP Name] -	Deletes a specific MVP's info in the database
+- !bhdelete [MVP Name] -	Deletes a specific MVP's info in the database
 
--!bhtimer [# of minutes]
+- !bhtimer [# of minutes]
 
 
 
