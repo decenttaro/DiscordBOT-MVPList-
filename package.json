@@ -1,7 +1,7 @@
 {
   "name": "mvp_list",
   "version": "1.0.0",
-  "description": "Discord Bot with CRUD Operations for Ragnarok MVP that lists time of death and respawn times of MVPs",
+  "description": "Discord Bot with CRUD Operations for games that you want to lists time of deaths. It also has a timer functionality",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
