@@ -3,11 +3,16 @@ Version 1.0.0
 
 Bot which you can list and edit time of death of Ragnarok MVPs.
 
+
+
+
 Version 1.1.0
 
 Added database and now with complete CRUD operations using Sequelize.
 
 Added Countdown timer.
+
+
 
 
 List of commands;
@@ -35,5 +40,6 @@ To start the bot in your discord channel/server.
 
 
 Disclaimer:
+
 This will not work since Discord will change the token when it goes to a different system. 
 Discord does this for security reasons.
