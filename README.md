@@ -3,8 +3,8 @@ Version 1.0.0
 Bot which you can list and edit time of death of Ragnarok MVPs.
 
 Version 1.1.0
-Added database and now with complete CRUD operations using Sequelize
-Added Countdown timer
+Added database and now with complete CRUD operations using Sequelize.
+Added Countdown timer.
 
 
 List of commands;
