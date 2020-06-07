@@ -36,7 +36,7 @@ To start the bot in your discord channel/server.
 - Open command prompt
 - Change directory to where the index.js file is. 
   Ex. cd Desktop\mvp_list
-- If you're in the desired folder, type nodemon index.js and wait for the "Starting MVP List Discord Bot..." to show in your cmd.
+- If you're in the desired folder, type 'npm run start' and wait for the "Starting MVP List Discord Bot..." to show in your cmd.
 
 
 Disclaimer:
